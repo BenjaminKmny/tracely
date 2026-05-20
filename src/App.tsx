@@ -6,25 +6,29 @@ import { SignupPage } from './pages/SignupPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LandingPage } from './pages/LandingPage'
+import { RidesDashboard } from './pages/RidesDashboard'
+import { EatsDashboard } from './pages/EatsDashboard'
+import { SettingsPage } from './pages/SettingsPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public landing page */}
           <Route path="/" element={<LandingPage />} />
 
-          {/* Public-only routes */}
           <Route element={<PublicOnlyRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           </Route>
 
-          {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/rides" element={<RidesDashboard />} />
+            <Route path="/dashboard/eats" element={<EatsDashboard />} />
+            <Route path="/dashboard/upload" element={<DashboardPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

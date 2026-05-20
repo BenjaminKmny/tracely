@@ -3,19 +3,13 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { UploadZone } from '../components/upload/UploadZone'
+import { Sidebar } from '../components/dashboard/Sidebar'
 
 const ACCENT = '#368CB7'
 const ACCENT_LIGHT = '#EBF4FA'
 
-function formatDate(iso: string | null) {
-  if (!iso) return null
-  return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  })
-}
-
 export function DashboardPage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [lastUpload, setLastUpload] = useState<string | null>(null)
   const [hasData, setHasData] = useState(false)
@@ -35,71 +29,48 @@ export function DashboardPage() {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
 
-      setLastUpload(profile?.last_upload_at ?? null)
-      setHasData((count ?? 0) > 0)
+      const uploadAt = profile?.last_upload_at ?? null
+      setLastUpload(uploadAt)
+      const dataExists = (count ?? 0) > 0
+      setHasData(dataExists)
       setLoading(false)
+
+      // If data exists and we're at /dashboard, redirect to rides
+      if (dataExists && window.location.pathname === '/dashboard') {
+        navigate('/dashboard/rides', { replace: true })
+      }
     }
     load()
-  }, [user])
+  }, [user, navigate])
 
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/login')
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#fafafa' }}>
+        <div style={{ width: 32, height: 32, border: `3px solid ${ACCENT_LIGHT}`, borderTop: `3px solid ${ACCENT}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fafafa', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+      <Sidebar lastUpload={lastUpload} />
 
-      {/* Nav */}
-      <header style={{ background: 'white', borderBottom: '1px solid #f0f0f0', padding: '0 32px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 58 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {lastUpload && (
-              <span style={{ fontSize: 12, color: '#aaa' }}>
-                Last updated {formatDate(lastUpload)}
-              </span>
-            )}
-            <span style={{ fontSize: 13, color: '#888' }}>{user?.email}</span>
-            <button
-              onClick={handleSignOut}
-              style={{ fontSize: 13, color: '#888', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0' }}
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 58px)' }}>
-          <div style={{ width: 32, height: 32, border: `3px solid ${ACCENT_LIGHT}`, borderTop: `3px solid ${ACCENT}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      ) : (
-        <main style={{ maxWidth: 680, margin: '0 auto', padding: '48px 32px' }}>
-
+      <main style={{ marginLeft: 220, flex: 1, padding: '48px 36px', maxWidth: 'calc(100vw - 220px)' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
           {!hasData ? (
-            /* Empty state — first upload */
             <>
               <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111', letterSpacing: '-0.6px', marginBottom: 6 }}>
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#111', letterSpacing: '-0.5px', marginBottom: 6 }}>
                   Welcome to Tracely
                 </h1>
-                <p style={{ fontSize: 15, color: '#888', lineHeight: 1.6 }}>
-                  Upload your Uber data export to see your full spending picture. Your data is stored securely and privately against your account.
+                <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6 }}>
+                  Upload your Uber data export to see your full spending picture.
                 </p>
               </div>
-
               <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #eee', marginBottom: 20 }}>
                 <UploadZone />
               </div>
-
               <div style={{ background: ACCENT_LIGHT, borderRadius: 12, padding: '14px 18px', border: `1px solid ${ACCENT}22` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: ACCENT, marginBottom: 4 }}>How to get your data</div>
                 <ol style={{ fontSize: 13, color: '#555', lineHeight: 1.7, margin: 0, paddingLeft: 18 }}>
@@ -111,27 +82,22 @@ export function DashboardPage() {
               </div>
             </>
           ) : (
-            /* Has data — show upload + placeholder for dashboard */
             <>
               <div style={{ marginBottom: 28 }}>
-                <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111', letterSpacing: '-0.6px', marginBottom: 6 }}>
-                  Your dashboard
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#111', letterSpacing: '-0.5px', marginBottom: 6 }}>
+                  Update your data
                 </h1>
                 <p style={{ fontSize: 14, color: '#aaa' }}>
-                  Last updated {formatDate(lastUpload)} · <span style={{ color: ACCENT }}>Dashboard charts coming in Phase 5</span>
+                  Upload a newer Uber export to add your latest activity.
                 </p>
               </div>
-
-              {/* Upload new data */}
-              <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #eee', marginBottom: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#111', marginBottom: 4 }}>Update your data</div>
-                <div style={{ fontSize: 13, color: '#aaa', marginBottom: 16 }}>Upload a newer Uber export to add your latest activity.</div>
+              <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #eee' }}>
                 <UploadZone />
               </div>
             </>
           )}
-        </main>
-      )}
+        </div>
+      </main>
     </div>
   )
 }
