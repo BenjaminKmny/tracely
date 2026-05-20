@@ -835,7 +835,7 @@ export function LandingPage() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
                 {[
-                  { n: '01', title: 'Request your data export', desc: 'Visit privacy.uber.com and download your personal data archive. It arrives as a ZIP file within 48 hours.' },
+                  { n: '01', title: 'Request your data export', desc: <span>Visit <a href="https://myprivacy.uber.com/exploreyourdata/download" target="_blank" rel="noreferrer" style={{ color: ACCENT, textDecoration: 'none', fontWeight: 500 }}>myprivacy.uber.com</a> and download your personal data archive. It arrives as a ZIP file within 48 hours.</span> },
                   { n: '02', title: 'Drop it into Tracely', desc: 'Drag the ZIP straight into the app. We parse everything instantly, right in your browser.' },
                   { n: '03', title: 'Understand your habits', desc: 'Your full history appears as a clean dashboard. Upload again anytime to keep things current.' },
                 ].map(s => (
