@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUpload } from '../../hooks/useUpload'
 
 const ACCENT = '#368CB7'
@@ -11,6 +12,7 @@ function fmt(iso: string) {
 export function UploadZone() {
   const { state, upload, confirmImport, cancelImport } = useUpload()
   const [isDragging, setIsDragging] = useState(false)
+  const navigate = useNavigate()
 
   const handleFile = useCallback((file: File) => {
     if (!file.name.endsWith('.zip')) {
@@ -34,6 +36,11 @@ export function UploadZone() {
     const file = e.target.files?.[0]
     if (file) handleFile(file)
     e.target.value = ''
+  }
+
+  const handleConfirm = async () => {
+    await confirmImport()
+    setTimeout(() => navigate('/dashboard/rides'), 5000)
   }
 
   const { status, preview, result, error } = state
@@ -102,7 +109,7 @@ export function UploadZone() {
             <>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 6 }}>Saving to your account</div>
               <div style={{ fontSize: 13, color: '#aaa' }}>
-                {result ? `Adding ${state.preview?.newRides ?? 0} new rides and ${state.preview?.newOrders ?? 0} new orders` : 'Almost there...'}
+                Adding {state.preview?.newRides ?? 0} new rides and {state.preview?.newOrders ?? 0} new orders...
               </div>
             </>
           )}
@@ -153,7 +160,6 @@ export function UploadZone() {
       {/* Preview state */}
       {status === 'preview' && preview && (
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #eee', overflow: 'hidden' }}>
-          {/* Header */}
           <div style={{ padding: '18px 22px', borderBottom: '1px solid #f5f5f5' }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#111', marginBottom: 3 }}>Review before importing</div>
             <div style={{ fontSize: 12, color: '#aaa' }}>
@@ -164,7 +170,6 @@ export function UploadZone() {
             </div>
           </div>
 
-          {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#f5f5f5' }}>
             {[
               { label: 'Rides in file', value: preview.totalRides },
@@ -181,7 +186,6 @@ export function UploadZone() {
             ))}
           </div>
 
-          {/* Warning if no new data */}
           {preview.newRides === 0 && preview.newOrders === 0 && (
             <div style={{ padding: '12px 22px', background: '#FFFBEB', borderTop: '1px solid #FEF3C7' }}>
               <div style={{ fontSize: 12, color: '#92400E' }}>
@@ -190,13 +194,13 @@ export function UploadZone() {
             </div>
           )}
 
-          {/* Actions */}
           <div style={{ padding: '16px 22px', display: 'flex', gap: 10, borderTop: '1px solid #f5f5f5' }}>
             <button
-              onClick={confirmImport}
+              onClick={handleConfirm}
               disabled={preview.newRides === 0 && preview.newOrders === 0}
               style={{
-                flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: preview.newRides === 0 && preview.newOrders === 0 ? 'not-allowed' : 'pointer',
+                flex: 1, padding: '10px 0', borderRadius: 10, border: 'none',
+                cursor: preview.newRides === 0 && preview.newOrders === 0 ? 'not-allowed' : 'pointer',
                 background: preview.newRides === 0 && preview.newOrders === 0 ? '#eee' : ACCENT,
                 color: preview.newRides === 0 && preview.newOrders === 0 ? '#aaa' : 'white',
                 fontSize: 14, fontWeight: 700, transition: 'all 0.15s',

@@ -93,14 +93,14 @@ export function useUpload() {
         return
       }
 
-      // Get existing latest dates from Supabase for merge preview
+      // Get existing latest dates for merge preview
       const { data: latestRide } = await supabase
         .from('uber_rides')
         .select('date')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       const { data: latestOrder } = await supabase
         .from('uber_eats_orders')
@@ -108,12 +108,11 @@ export function useUpload() {
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       const latestRideDate = latestRide?.date ? new Date(latestRide.date) : null
       const latestOrderDate = latestOrder?.date ? new Date(latestOrder.date) : null
 
-      // Count how many are new
       const newRides = latestRideDate
         ? result.rides.filter(r => r.date && new Date(r.date) > latestRideDate).length
         : result.rides.length
@@ -122,7 +121,6 @@ export function useUpload() {
         ? result.eats_orders.filter(o => o.date && new Date(o.date) > latestOrderDate).length
         : result.eats_orders.length
 
-      // Dates in the new file
       const allDates = [
         ...result.rides.map(r => r.date),
         ...result.eats_orders.map(o => o.date),
@@ -158,69 +156,73 @@ export function useUpload() {
 
     try {
       // Rides — merge by date
-    if (result.rides.length > 0) {
+      if (result.rides.length > 0) {
         const { data: latestRideData } = await supabase
-        .from('uber_rides')
-        .select('date')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(1)
-    
-        const latestDate = latestRideData && latestRideData.length > 0
-        ? new Date(latestRideData[0].date)
-        : null
-    
-        const newRides = latestDate
-        ? result.rides.filter(r => r.date && new Date(r.date) > latestDate)
-        : result.rides
-    
+          .from('uber_rides')
+          .select('date')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const latestRideDate = latestRideData?.date ? new Date(latestRideData.date) : null
+
+        const newRides = latestRideDate
+          ? result.rides.filter(r => r.date && new Date(r.date) > latestRideDate)
+          : result.rides
+
         if (newRides.length > 0) {
-        const payload = newRides.map(r => ({ ...r, user_id: user.id }))
-        for (let i = 0; i < payload.length; i += 500) {
+          const payload = newRides.map(r => ({ ...r, user_id: user.id }))
+          for (let i = 0; i < payload.length; i += 500) {
             const { error } = await supabase.from('uber_rides').insert(payload.slice(i, i + 500))
             if (error) throw new Error(`Rides insert failed: ${error.message}`)
+          }
         }
-        }
-    }
+      }
 
-    // Eats orders — merge by date
-    if (result.eats_orders.length > 0) {
+      // Eats orders — merge by date
+      if (result.eats_orders.length > 0) {
         const { data: latestOrderData } = await supabase
-        .from('uber_eats_orders')
-        .select('date')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(1)
-    
-        const latestDate = latestOrderData && latestOrderData.length > 0
-        ? new Date(latestOrderData[0].date)
-        : null
-    
-        const newOrders = latestDate
-        ? result.eats_orders.filter(o => o.date && new Date(o.date) > latestDate)
-        : result.eats_orders
-    
+          .from('uber_eats_orders')
+          .select('date')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const latestOrderDate = latestOrderData?.date ? new Date(latestOrderData.date) : null
+
+        const newOrders = latestOrderDate
+          ? result.eats_orders.filter(o => o.date && new Date(o.date) > latestOrderDate)
+          : result.eats_orders
+
         for (const order of newOrders) {
-        const { items, ...orderData } = order
-        const { data: insertedOrder, error: orderError } = await supabase
+          const { items, ...orderData } = order
+
+          const { data: insertedOrder, error: orderError } = await supabase
             .from('uber_eats_orders')
             .insert({ ...orderData, user_id: user.id })
             .select('id')
             .single()
-    
-        if (orderError) continue
-    
-        if (items.length > 0) {
-            await supabase.from('uber_eats_items').insert(
-            items.map(item => ({
+
+          if (orderError) {
+            console.error('Order insert failed:', orderError.message)
+            continue
+          }
+
+          if (items.length > 0) {
+            const { error: itemsError } = await supabase.from('uber_eats_items').insert(
+              items.map(item => ({
                 ...item,
                 order_id: insertedOrder.id,
                 user_id: user.id,
-            }))
+              }))
             )
+            if (itemsError) console.error('Items insert failed:', itemsError.message)
+            else console.log('Items inserted:', items.length, 'for order', insertedOrder.id)
+          }
         }
-        }
-    }
+      }
 
       // Update profile
       await supabase
@@ -247,7 +249,6 @@ export function useUpload() {
     }
   }
 
-  // Cancel from preview — go back to idle
   const cancelImport = () => {
     setState(s => ({ ...s, status: 'idle', result: null, preview: null }))
   }
