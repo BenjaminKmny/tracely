@@ -35,14 +35,15 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 function computeStats(data: RideRow[]): Omit<RidesStats, 'monthlySpend' | 'dayOfWeek' | 'hourOfDay' | 'currency'> {
+  // Only completed rides (have a fare)
   const completed = data.filter(r => r.fare_eur > 0)
   const totalSpent = completed.reduce((s, r) => s + r.fare_eur, 0)
   const avgFare = completed.length > 0 ? totalSpent / completed.length : 0
-  const surgeRides = data.filter(r => r.surged).length
+  const surgeRides = completed.filter(r => r.surged).length
   const fares = completed.map(r => r.fare_eur)
 
   const routeMap: Record<string, number> = {}
-  data.forEach(r => {
+  completed.forEach(r => {
     if (!r.pickup || !r.dropoff) return
     const pickup = r.pickup.split(',')[0].trim()
     const dropoff = r.dropoff.split(',')[0].trim()
@@ -50,19 +51,26 @@ function computeStats(data: RideRow[]): Omit<RidesStats, 'monthlySpend' | 'dayOf
     const key = `${pickup} → ${dropoff}`
     routeMap[key] = (routeMap[key] ?? 0) + 1
   })
-  const topRoutes = Object.entries(routeMap).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([route, count]) => ({ route, count }))
+  const topRoutes = Object.entries(routeMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([route, count]) => ({ route, count }))
 
   const cityMap: Record<string, number> = {}
-  data.forEach(r => { if (r.city) cityMap[r.city] = (cityMap[r.city] ?? 0) + 1 })
-  const cityBreakdown = Object.entries(cityMap).sort((a, b) => b[1] - a[1]).map(([city, count]) => ({ city, count }))
+  completed.forEach(r => { if (r.city) cityMap[r.city] = (cityMap[r.city] ?? 0) + 1 })
+  const cityBreakdown = Object.entries(cityMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([city, count]) => ({ city, count }))
 
   const typeMap: Record<string, number> = {}
-  data.forEach(r => { if (r.ride_type) typeMap[r.ride_type] = (typeMap[r.ride_type] ?? 0) + 1 })
-  const rideTypes = Object.entries(typeMap).sort((a, b) => b[1] - a[1]).map(([type, count]) => ({ type, count }))
+  completed.forEach(r => { if (r.ride_type) typeMap[r.ride_type] = (typeMap[r.ride_type] ?? 0) + 1 })
+  const rideTypes = Object.entries(typeMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([type, count]) => ({ type, count }))
 
   return {
     totalSpent: Math.round(totalSpent * 100) / 100,
-    totalRides: data.length,
+    totalRides: completed.length,
     avgFare: Math.round(avgFare * 100) / 100,
     surgeRides,
     cheapestRide: fares.length > 0 ? Math.round(Math.min(...fares) * 100) / 100 : 0,
@@ -105,21 +113,22 @@ export function useRidesData(year: number) {
           return
         }
 
-        setAllRides(data as RideRow[])
+        // Store only completed rides for filtering
+        const completedRides = (data as RideRow[]).filter(r => r.fare_eur > 0)
+        setAllRides(completedRides)
 
         const currencyCounts: Record<string, number> = {}
-        data.forEach(r => { currencyCounts[r.currency] = (currencyCounts[r.currency] ?? 0) + 1 })
-        const currency = Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0][0]
+        completedRides.forEach(r => { currencyCounts[r.currency] = (currencyCounts[r.currency] ?? 0) + 1 })
+        const currency = Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'EUR'
 
+        // Monthly — completed only
         const monthlyMap: Record<number, { amount: number; rides: number; fares: number[]; surge: number }> = {}
-        data.forEach(r => {
+        completedRides.forEach(r => {
           const m = new Date(r.date).getMonth()
           if (!monthlyMap[m]) monthlyMap[m] = { amount: 0, rides: 0, fares: [], surge: 0 }
           monthlyMap[m].rides += 1
-          if (r.fare_eur > 0) {
-            monthlyMap[m].amount += r.fare_eur
-            monthlyMap[m].fares.push(r.fare_eur)
-          }
+          monthlyMap[m].amount += r.fare_eur
+          monthlyMap[m].fares.push(r.fare_eur)
           if (r.surged) monthlyMap[m].surge += 1
         })
 
@@ -136,24 +145,26 @@ export function useRidesData(year: number) {
           }
         })
 
+        // Day of week — completed only
         const dowMap: Record<number, number> = {}
-        data.forEach(r => {
+        completedRides.forEach(r => {
           const d = new Date(r.date).getDay()
           const adjusted = d === 0 ? 6 : d - 1
           dowMap[adjusted] = (dowMap[adjusted] ?? 0) + 1
         })
         const dayOfWeek = DAYS.map((day, i) => ({ day, count: dowMap[i] ?? 0 }))
 
+        // Hour of day — completed only
         const hourMap: Record<number, number> = {}
-        data.forEach(r => {
+        completedRides.forEach(r => {
           const h = new Date(r.date).getHours()
           hourMap[h] = (hourMap[h] ?? 0) + 1
         })
         const hourOfDay = Array.from({ length: 24 }, (_, i) => ({ hour: i, count: hourMap[i] ?? 0 }))
 
-        const base = computeStats(data as RideRow[])
-
+        const base = computeStats(completedRides)
         setStats({ ...base, monthlySpend, dayOfWeek, hourOfDay, currency })
+
       } catch (e: any) {
         setError(e.message)
       } finally {
@@ -164,7 +175,6 @@ export function useRidesData(year: number) {
     fetch()
   }, [user, year])
 
-  // Filter rides by any dimension for dynamic lists
   const filterRides = (type: 'month' | 'dow' | 'hour' | null, index: number | null): RideRow[] => {
     if (type === null || index === null) return allRides
     return allRides.filter(r => {

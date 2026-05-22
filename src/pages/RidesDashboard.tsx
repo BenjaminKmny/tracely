@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react'
 import { Sidebar } from '../components/dashboard/Sidebar'
 import { MetricCard } from '../components/dashboard/MetricCard'
 import { BarChart } from '../components/dashboard/BarChart'
+import { InsightCard } from '../components/dashboard/InsightCard'
+import { SpendingPace } from '../components/dashboard/SpendingPace'
+import { Benchmarking } from '../components/dashboard/Benchmarking'
+import { YearInReviewButton } from '../components/dashboard/YearInReview'
 import { useRidesData } from '../hooks/useRidesData'
+import { useEatsData } from '../hooks/useEatsData'
+import { generateRidesInsights } from '../hooks/useInsights'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -31,11 +37,24 @@ export function RidesDashboard() {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
   const [modalType, setModalType] = useState<HoverType>(null)
   const [modalIndex, setModalIndex] = useState<number | null>(null)
+  const [rideDetailModal, setRideDetailModal] = useState<'cheapest' | 'expensive' | null>(null)
   const { stats, allRides, filterRides, loading } = useRidesData(year)
+  const { stats: eatsStats } = useEatsData(year)
   const { user } = useAuth()
 
   const recentYears = [currentYear, currentYear - 1, currentYear - 2]
   const olderYears = Array.from({ length: Math.max(0, currentYear - 2021) }, (_, i) => currentYear - 3 - i)
+
+  const ridesInsights = stats ? generateRidesInsights(stats, year) : []
+  const previewInsights = ridesInsights.slice(0, 3)
+
+  const cheapestRide = allRides.length > 0
+    ? allRides.reduce((best, r) => r.fare_eur < best.fare_eur ? r : best)
+    : null
+
+  const mostExpensiveRide = allRides.length > 0
+    ? allRides.reduce((best, r) => r.fare_eur > best.fare_eur ? r : best)
+    : null
 
   useEffect(() => {
     if (!user) return
@@ -51,17 +70,19 @@ export function RidesDashboard() {
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setModalType(null); setModalIndex(null) }
+      if (e.key === 'Escape') {
+        setModalType(null)
+        setModalIndex(null)
+        setRideDetailModal(null)
+      }
     }
     document.addEventListener('keydown', handleEsc)
     return () => document.removeEventListener('keydown', handleEsc)
   }, [])
 
-  // Filtered rides for lists and modal
   const filteredRides = filterRides(hoverType, hoverIndex)
   const modalRides = filterRides(modalType, modalIndex)
 
-  // Dynamic top routes from filtered rides
   const dynamicRoutes = (() => {
     const routeMap: Record<string, number> = {}
     filteredRides.forEach(r => {
@@ -75,14 +96,12 @@ export function RidesDashboard() {
     return Object.entries(routeMap).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([route, count]) => ({ route, count }))
   })()
 
-  // Dynamic city breakdown
   const dynamicCities = (() => {
     const cityMap: Record<string, number> = {}
     filteredRides.forEach(r => { if (r.city) cityMap[r.city] = (cityMap[r.city] ?? 0) + 1 })
     return Object.entries(cityMap).sort((a, b) => b[1] - a[1]).map(([city, count]) => ({ city, count }))
   })()
 
-  // Active metric cards
   const activeStats = hoverType === 'month' && hoverIndex !== null && stats
     ? {
         totalSpent: stats.monthlySpend[hoverIndex].amount,
@@ -105,13 +124,11 @@ export function RidesDashboard() {
       }
     : stats
 
-  // Hover label for header
   const hoverLabel = hoverType === 'month' && hoverIndex !== null ? MONTHS[hoverIndex]
     : hoverType === 'dow' && hoverIndex !== null ? DAYS[hoverIndex]
     : hoverType === 'hour' && hoverIndex !== null ? (hoverIndex === 0 ? '12am' : hoverIndex < 12 ? `${hoverIndex}am` : hoverIndex === 12 ? '12pm' : `${hoverIndex - 12}pm`)
     : null
 
-  // Modal label
   const modalLabel = modalType === 'month' && modalIndex !== null ? MONTHS[modalIndex]
     : modalType === 'dow' && modalIndex !== null ? DAYS[modalIndex]
     : modalType === 'hour' && modalIndex !== null ? (modalIndex === 0 ? '12am' : modalIndex < 12 ? `${modalIndex}am` : modalIndex === 12 ? '12pm' : `${modalIndex - 12}pm`)
@@ -133,33 +150,34 @@ export function RidesDashboard() {
               {hoverLabel ? `Showing data for ${hoverLabel} ${year}` : 'Your Uber ride history and spending'}
             </p>
           </div>
-
-          {/* Year selector */}
-          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            {recentYears.map(y => (
-              <button key={y} onClick={() => setYear(y)}
-                style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', background: year === y ? ACCENT : 'white', color: year === y ? 'white' : '#888', border: `1px solid ${year === y ? ACCENT : '#eee'}`, transition: 'all 0.15s' }}
-              >{y}</button>
-            ))}
-            {olderYears.length > 0 && (
-              <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
-                <button onClick={() => setDropdownOpen(o => !o)}
-                  style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', background: olderYears.includes(year) ? ACCENT : 'white', color: olderYears.includes(year) ? 'white' : '#888', border: `1px solid ${olderYears.includes(year) ? ACCENT : '#eee'}`, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 4 }}
-                >
-                  {olderYears.includes(year) ? year : 'Earlier'}
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                {dropdownOpen && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', border: '1px solid #eee', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.08)', zIndex: 50, minWidth: 100, overflow: 'hidden' }}>
-                    {olderYears.map(y => (
-                      <button key={y} onClick={() => { setYear(y); setDropdownOpen(false) }}
-                        style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 16px', fontSize: 13, fontWeight: year === y ? 600 : 400, color: year === y ? ACCENT : '#555', background: year === y ? ACCENT_LIGHT : 'transparent', border: 'none', cursor: 'pointer' }}
-                      >{y}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {stats && <YearInReviewButton year={year} ridesStats={stats} eatsStats={eatsStats ?? null} />}
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              {recentYears.map(y => (
+                <button key={y} onClick={() => setYear(y)}
+                  style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', background: year === y ? ACCENT : 'white', color: year === y ? 'white' : '#888', border: `1px solid ${year === y ? ACCENT : '#eee'}`, transition: 'all 0.15s' }}
+                >{y}</button>
+              ))}
+              {olderYears.length > 0 && (
+                <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => setDropdownOpen(o => !o)}
+                    style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', background: olderYears.includes(year) ? ACCENT : 'white', color: olderYears.includes(year) ? 'white' : '#888', border: `1px solid ${olderYears.includes(year) ? ACCENT : '#eee'}`, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 4 }}
+                  >
+                    {olderYears.includes(year) ? year : 'Earlier'}
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {dropdownOpen && (
+                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', border: '1px solid #eee', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.08)', zIndex: 50, minWidth: 100, overflow: 'hidden' }}>
+                      {olderYears.map(y => (
+                        <button key={y} onClick={() => { setYear(y); setDropdownOpen(false) }}
+                          style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 16px', fontSize: 13, fontWeight: year === y ? 600 : 400, color: year === y ? ACCENT : '#555', background: year === y ? ACCENT_LIGHT : 'transparent', border: 'none', cursor: 'pointer' }}
+                        >{y}</button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -177,13 +195,28 @@ export function RidesDashboard() {
         ) : (
           <>
             {/* Metric cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
               <MetricCard label="Total spent" value={fmt(activeStats?.totalSpent ?? 0)} sub={hoverLabel ?? `${stats.currency} normalised`} accent tooltip="All completed ride fares converted to EUR" />
-              <MetricCard label="Total rides" value={String(activeStats?.totalRides ?? 0)} tooltip="All rides including cancelled" />
+              <MetricCard label="Total rides" value={String(activeStats?.totalRides ?? 0)} tooltip="Completed rides only — cancelled trips excluded" />
               <MetricCard label="Avg fare" value={fmt(activeStats?.avgFare ?? 0)} tooltip="Average fare across completed rides only" />
               <MetricCard label="Surge rides" value={String(activeStats?.surgeRides ?? 0)} sub={activeStats && activeStats.totalRides > 0 ? `${Math.round((activeStats.surgeRides / activeStats.totalRides) * 100)}% of trips` : undefined} tooltip="Rides where Uber applied surge pricing" />
-              <MetricCard label="Cheapest ride" value={fmt(activeStats?.cheapestRide ?? 0)} tooltip="Lowest single fare you paid" />
-              <MetricCard label="Most expensive" value={fmt(activeStats?.mostExpensiveRide ?? 0)} tooltip="Highest single fare you paid" />
+              <MetricCard
+                label="Cheapest ride"
+                value={fmt(activeStats?.cheapestRide ?? 0)}
+                tooltip="Lowest single fare you paid — click to see details"
+                onClick={cheapestRide ? () => setRideDetailModal('cheapest') : undefined}
+              />
+              <MetricCard
+                label="Most expensive"
+                value={fmt(activeStats?.mostExpensiveRide ?? 0)}
+                tooltip="Highest single fare you paid — click to see details"
+                onClick={mostExpensiveRide ? () => setRideDetailModal('expensive') : undefined}
+              />
+            </div>
+
+            {/* Spending pace */}
+            <div style={{ marginBottom: 16 }}>
+              <SpendingPace monthlySpend={stats.monthlySpend} year={year} label="Rides" />
             </div>
 
             {/* Monthly spend */}
@@ -196,6 +229,13 @@ export function RidesDashboard() {
                 onClickBar={i => { setModalType('month'); setModalIndex(i) }}
               />
             </div>
+
+            {/* Insight cards */}
+            {previewInsights.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10, marginBottom: 16 }}>
+                {previewInsights.map(i => <InsightCard key={i.id} emoji={i.emoji} text={i.text} highlight={i.highlight} compact />)}
+              </div>
+            )}
 
             {/* Day + Hour */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -261,7 +301,7 @@ export function RidesDashboard() {
             </div>
 
             {/* Ride types */}
-            <div style={{ background: 'white', border: '1px solid #eee', borderRadius: 14, padding: '18px 20px' }}>
+            <div style={{ background: 'white', border: '1px solid #eee', borderRadius: 14, padding: '18px 20px', marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#111', marginBottom: 14 }}>Ride types</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {stats.rideTypes.map((t, i) => {
@@ -276,11 +316,21 @@ export function RidesDashboard() {
                 })}
               </div>
             </div>
+
+            {/* Benchmarking */}
+            <Benchmarking
+              type="rides"
+              totalSpent={stats.totalSpent}
+              avgFare={stats.avgFare}
+              surgeRate={Math.round((stats.surgeRides / stats.totalRides) * 100)}
+              totalRides={stats.totalRides}
+              monthsActive={stats.monthlySpend.filter(m => m.rides > 0).length}
+            />
           </>
         )}
       </main>
 
-      {/* Modal */}
+      {/* Bar drill-down modal */}
       {modalIndex !== null && modalLabel && (
         <>
           <div onClick={() => { setModalType(null); setModalIndex(null) }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100 }} />
@@ -329,6 +379,46 @@ export function RidesDashboard() {
           </div>
         </>
       )}
+
+      {/* Ride detail modal (cheapest / most expensive) */}
+      {rideDetailModal && (() => {
+        const ride = rideDetailModal === 'cheapest' ? cheapestRide : mostExpensiveRide
+        if (!ride) return null
+        return (
+          <>
+            <div onClick={() => setRideDetailModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100 }} />
+            <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'white', borderRadius: 16, width: 420, zIndex: 101, boxShadow: '0 24px 80px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 24px', borderBottom: '1px solid #f0f0f0' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>
+                  {rideDetailModal === 'cheapest' ? '🎯 Cheapest ride' : '💸 Most expensive ride'}
+                </div>
+                <button onClick={() => setRideDetailModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#aaa' }}>×</button>
+              </div>
+              <div style={{ padding: '20px 24px' }}>
+                <div style={{ fontSize: 36, fontWeight: 900, color: ACCENT, letterSpacing: '-1px', marginBottom: 16 }}>
+                  €{ride.fare_eur.toFixed(2)}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  {[
+                    { label: 'Date', value: formatDate(ride.date) },
+                    { label: 'Pickup', value: ride.pickup?.split(',')[0] ?? '—' },
+                    { label: 'Dropoff', value: ride.dropoff?.split(',')[0] ?? '—' },
+                    { label: 'City', value: ride.city || '—' },
+                    { label: 'Ride type', value: ride.ride_type || '—' },
+                    { label: 'Duration', value: ride.duration_mins > 0 ? `${ride.duration_mins} minutes` : '—' },
+                    { label: 'Surge', value: ride.surged ? 'Yes' : 'No' },
+                  ].map((row, i, arr) => (
+                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #f5f5f5' : 'none' }}>
+                      <div style={{ fontSize: 12, color: '#aaa' }}>{row.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: '#111' }}>{row.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )
+      })()}
     </div>
   )
 }

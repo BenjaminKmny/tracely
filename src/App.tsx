@@ -9,6 +9,7 @@ import { LandingPage } from './pages/LandingPage'
 import { RidesDashboard } from './pages/RidesDashboard'
 import { EatsDashboard } from './pages/EatsDashboard'
 import { SettingsPage } from './pages/SettingsPage'
+import { InsightsPage } from './pages/InsightsPage'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/dashboard/rides" element={<RidesDashboard />} />
             <Route path="/dashboard/eats" element={<EatsDashboard />} />
+            <Route path="/dashboard/insights" element={<InsightsPage />} />
             <Route path="/dashboard/upload" element={<DashboardPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
