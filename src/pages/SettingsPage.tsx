@@ -57,13 +57,37 @@ export function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     if (!user) return
-    // Delete all data first
-    await supabase.from('uber_eats_items').delete().eq('user_id', user.id)
-    await supabase.from('uber_eats_orders').delete().eq('user_id', user.id)
-    await supabase.from('uber_rides').delete().eq('user_id', user.id)
-    await supabase.from('profiles').delete().eq('id', user.id)
-    await signOut()
-    navigate('/')
+    setDeleting(true)
+  
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+  
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+  
+      const result = await response.json()
+  
+      if (!response.ok) {
+        throw new Error(result.error ?? 'Failed to delete account')
+      }
+  
+      // Sign out and redirect
+      await signOut()
+      navigate('/')
+  
+    } catch (e: any) {
+      console.error('Delete account error:', e)
+      alert(`Failed to delete account: ${e.message}`)
+      setDeleting(false)
+    }
   }
 
   const handleDownloadData = async () => {

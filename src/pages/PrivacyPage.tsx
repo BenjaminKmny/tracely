@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+
 
 const ACCENT = '#368CB7'
 
 export function PrivacyPage() {
+    useEffect(() => {
+        window.scrollTo(0, 0)
+        }, [])
   return (
     <div style={{ minHeight: '100vh', background: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
@@ -29,7 +34,7 @@ export function PrivacyPage() {
         {[
           {
             title: '1. Who we are',
-            body: `Tracely is a personal analytics tool that helps you understand your spending on ride-hailing and food delivery platforms. Tracely is operated as a personal project and the data controller is the developer reachable at benjamin@kemeny.cl.`,
+            body: `Tracely is a personal analytics tool that helps you understand your spending on ride-hailing and food delivery platforms. Tracely is operated as a personal project and the data controller is the developer reachable at privacy@tracelyapp.com.`,
           },
           {
             title: '2. What data we collect',
@@ -63,7 +68,7 @@ We do not collect any data automatically. All data is provided explicitly by you
 - Right to rectification: contact us if any data is inaccurate
 - Right to object: you can stop using Tracely and delete your data at any time
 
-To exercise any of these rights, use the Settings page or contact us at benjamin@kemeny.cl.`,
+To exercise any of these rights, use the Settings page or contact us at privacy@tracelyapp.com.`,
           },
           {
             title: '7. Cookies and tracking',
@@ -79,7 +84,7 @@ To exercise any of these rights, use the Settings page or contact us at benjamin
           },
           {
             title: '10. Contact',
-            body: `For any privacy-related questions or requests, contact us at benjamin@kemeny.cl.`,
+            body: `For any privacy-related questions or requests, contact us at privacy@tracelyapp.com.`,
           },
         ].map(section => (
           <div key={section.title} style={{ marginBottom: 36, paddingBottom: 36, borderBottom: '1px solid #f5f5f5' }}>
