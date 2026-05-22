@@ -962,7 +962,7 @@ export function LandingPage() {
             <span style={{ fontSize: 13, fontWeight: 800, color: '#111' }}>Tracely</span>
           </div>
           <div style={{ display: 'flex', gap: 20 }}>
-            <a href="#" style={{ fontSize: 12, color: '#bbb', textDecoration: 'none' }}>Privacy policy</a>
+            <Link to="/privacy" style={{ fontSize: 12, color: '#bbb', textDecoration: 'none' }}>Privacy policy</Link>
             <a href="#" style={{ fontSize: 12, color: '#bbb', textDecoration: 'none' }}>Terms of service</a>
           </div>
           <span style={{ fontSize: 12, color: '#ddd' }}>2026 Tracely</span>

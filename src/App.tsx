@@ -10,6 +10,7 @@ import { RidesDashboard } from './pages/RidesDashboard'
 import { EatsDashboard } from './pages/EatsDashboard'
 import { SettingsPage } from './pages/SettingsPage'
 import { InsightsPage } from './pages/InsightsPage'
+import { PrivacyPage } from './pages/PrivacyPage'
 
 export default function App() {
   return (
@@ -32,6 +33,8 @@ export default function App() {
             <Route path="/dashboard/upload" element={<DashboardPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
+
+          <Route path="/privacy" element={<PrivacyPage />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

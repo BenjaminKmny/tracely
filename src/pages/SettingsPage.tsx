@@ -66,6 +66,43 @@ export function SettingsPage() {
     navigate('/')
   }
 
+  const handleDownloadData = async () => {
+    if (!user) return
+  
+    const { data: rides } = await supabase
+      .from('uber_rides')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: true })
+  
+    const { data: orders } = await supabase
+      .from('uber_eats_orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: true })
+  
+    const { data: items } = await supabase
+      .from('uber_eats_items')
+      .select('*')
+      .eq('user_id', user.id)
+  
+    const exportData = {
+      exported_at: new Date().toISOString(),
+      account: { email: user.email },
+      rides: rides ?? [],
+      eats_orders: orders ?? [],
+      eats_items: items ?? [],
+    }
+  
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tracely-export-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
       <Sidebar lastUpload={lastUpload} />
@@ -115,6 +152,24 @@ export function SettingsPage() {
               </div>
             </div>
           )}
+
+
+          {/* Data export */}
+            <div style={{ background: 'white', border: '1px solid #eee', borderRadius: 14, padding: '20px 24px', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#111', marginBottom: 16 }}>Export your data</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#111', marginBottom: 2 }}>Download all your data</div>
+                <div style={{ fontSize: 12, color: '#aaa' }}>Export your rides, orders and items as a JSON file. This is your GDPR data portability right.</div>
+                </div>
+                <button
+                onClick={handleDownloadData}
+                style={{ fontSize: 13, fontWeight: 600, color: '#368CB7', background: '#EBF4FA', border: '1px solid #368CB733', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', whiteSpace: 'nowrap', marginLeft: 16 }}
+                >
+                Download JSON
+                </button>
+            </div>
+            </div>
 
           {/* Danger zone */}
           <div style={{ background: 'white', border: '1px solid #FEE2E2', borderRadius: 14, padding: '20px 24px' }}>

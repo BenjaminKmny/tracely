@@ -13,6 +13,8 @@ export function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [verificationSent, setVerificationSent] = useState(false)
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false)
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -22,6 +24,10 @@ export function SignupPage() {
     const { error } = await signUp(email, password, fullName)
     if (error) { setError(error.message); setLoading(false) }
     else setVerificationSent(true)
+    if (!agreedToPolicy) {
+      setError('Please agree to the Privacy Policy to continue.')
+      return
+    }
   }
 
   const handleGoogle = async () => {
@@ -137,9 +143,26 @@ export function SignupPage() {
             <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">{error}</p>
           )}
 
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <input
+              type="checkbox"
+              id="policy"
+              checked={agreedToPolicy}
+              onChange={e => setAgreedToPolicy(e.target.checked)}
+              style={{ marginTop: 2, accentColor: '#368CB7', width: 14, height: 14, flexShrink: 0, cursor: 'pointer' }}
+            />
+            <label htmlFor="policy" style={{ fontSize: 12, color: '#888', lineHeight: 1.5, cursor: 'pointer' }}>
+              I agree to the{' '}
+              <Link to="/privacy" target="_blank" style={{ color: '#368CB7', textDecoration: 'none', fontWeight: 500 }}>
+                Privacy Policy
+              </Link>
+              . My data is stored securely and I can delete it anytime.
+            </label>
+          </div>
+
           <button
             type="submit"
-            disabled={loading || googleLoading}
+            disabled={loading || googleLoading || !agreedToPolicy}
             className="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {loading ? (
