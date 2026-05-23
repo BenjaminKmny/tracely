@@ -658,7 +658,7 @@ export function LandingPage() {
                 <span style={{ fontSize: 10, background: ACCENT, color: 'white', padding: '2px 8px', borderRadius: 100, fontWeight: 700 }}>Coming soon</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-                <span style={{ fontSize: 40, fontWeight: 900, color: 'white', letterSpacing: '-1px' }}>€6.99</span>
+                <span style={{ fontSize: 40, fontWeight: 900, color: 'white', letterSpacing: '-1px' }}>$2.99</span>
                 <span style={{ fontSize: 13, color: '#555' }}>/month</span>
               </div>
               {['Everything in Free', 'Bolt, Deliveroo and more', 'AI meal replacement suggestions', 'Live ingredient pricing', 'Priority support'].map(item => (
