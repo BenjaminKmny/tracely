@@ -1,4 +1,6 @@
 import { useLocation, Link } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const ACCENT = '#368CB7'
 
@@ -12,22 +14,21 @@ const PAGE_TITLES: Record<string, string> = {
 
 export function MobileHeader() {
   const location = useLocation()
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const title = PAGE_TITLES[location.pathname] ?? 'Tracely'
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
 
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 52,
-      background: 'white',
-      borderBottom: '1px solid #f0f0f0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 16px',
-      zIndex: 50,
+      position: 'fixed', top: 0, left: 0, right: 0, height: 52,
+      background: 'white', borderBottom: '1px solid #f0f0f0',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 16px', zIndex: 50,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     }}>
       <Link to="/dashboard/rides" style={{ display: 'flex', alignItems: 'center', gap: 7, textDecoration: 'none' }}>
@@ -37,7 +38,12 @@ export function MobileHeader() {
         <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
       </Link>
       <span style={{ fontSize: 15, fontWeight: 700, color: '#111', letterSpacing: '-0.3px' }}>{title}</span>
-      <div style={{ width: 60 }} />
+      <button
+        onClick={handleSignOut}
+        style={{ fontSize: 12, color: '#aaa', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
+      >
+        Sign out
+      </button>
     </div>
   )
 }

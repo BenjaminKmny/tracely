@@ -142,7 +142,7 @@ export function RidesDashboard() {
     : null
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa', fontFamily: '...', overflowX: 'hidden' }}>
       <Sidebar lastUpload={lastUpload} />
       {isMobile && <MobileHeader />}
       {isMobile && <BottomTabBar />}
