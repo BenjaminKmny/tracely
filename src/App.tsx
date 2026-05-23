@@ -11,6 +11,7 @@ import { EatsDashboard } from './pages/EatsDashboard'
 import { SettingsPage } from './pages/SettingsPage'
 import { InsightsPage } from './pages/InsightsPage'
 import { PrivacyPage } from './pages/PrivacyPage'
+import { UploadPage } from './pages/UploadPage'
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
             <Route path="/dashboard/rides" element={<RidesDashboard />} />
             <Route path="/dashboard/eats" element={<EatsDashboard />} />
             <Route path="/dashboard/insights" element={<InsightsPage />} />
-            <Route path="/dashboard/upload" element={<DashboardPage />} />
+            <Route path="/dashboard/upload" element={<UploadPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
 
