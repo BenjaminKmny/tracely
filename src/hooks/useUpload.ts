@@ -36,30 +36,16 @@ export function useUpload() {
 
   const checkUploadEligibility = async (): Promise<{ canUpload: boolean; lastUploadAt: string | null }> => {
     if (!user) return { canUpload: false, lastUploadAt: null }
-
-    if (import.meta.env.VITE_DISABLE_UPLOAD_LIMIT === 'true') {
-      return { canUpload: true, lastUploadAt: null }
-    }
-
+  
+    // No upload frequency limit — users can upload anytime
+    // Plan-based feature gating will be added when Stripe is set up
     const { data: profile } = await supabase
       .from('profiles')
-      .select('last_upload_at, plan')
+      .select('last_upload_at')
       .eq('id', user.id)
       .single()
-
-    if (!profile?.last_upload_at) return { canUpload: true, lastUploadAt: null }
-
-    const plan = profile.plan ?? 'free'
-    if (plan === 'pro') return { canUpload: true, lastUploadAt: profile.last_upload_at }
-
-    const lastUpload = new Date(profile.last_upload_at)
-    const twoMonthsAgo = new Date()
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
-
-    return {
-      canUpload: lastUpload < twoMonthsAgo,
-      lastUploadAt: profile.last_upload_at,
-    }
+  
+    return { canUpload: true, lastUploadAt: profile?.last_upload_at ?? null }
   }
 
   // Step 1 — parse only, no saving
