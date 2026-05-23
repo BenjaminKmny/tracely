@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUpload } from '../../hooks/useUpload'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 const ACCENT = '#368CB7'
 const ACCENT_LIGHT = '#EBF4FA'
@@ -13,6 +14,7 @@ export function UploadZone() {
   const { state, upload, confirmImport, cancelImport } = useUpload()
   const [isDragging, setIsDragging] = useState(false)
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
 
   const handleFile = useCallback((file: File) => {
     if (!file.name.endsWith('.zip')) {
@@ -57,17 +59,24 @@ export function UploadZone() {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
-          onClick={() => { if (!isLoading && !isDone) document.getElementById('zip-input')?.click() }}
           style={{
             border: `2px dashed ${isDragging ? ACCENT : isDone ? '#22C55E' : status === 'error' ? '#EF4444' : '#d4e4f0'}`,
             borderRadius: 16,
-            padding: '36px 28px',
+            padding: isMobile ? '32px 20px' : '36px 28px',
             textAlign: 'center',
             background: isDragging ? ACCENT_LIGHT : isDone ? '#F0FDF4' : status === 'error' ? '#FEF2F2' : 'white',
             transition: 'all 0.2s',
-            cursor: isLoading || isDone ? 'default' : 'pointer',
           }}
         >
+          {/* Hidden file input — works on both desktop and mobile */}
+          <input
+            id="zip-input"
+            type="file"
+            accept=".zip,application/zip,application/x-zip-compressed,application/octet-stream"
+            style={{ display: 'none' }}
+            onChange={onFileInput}
+          />
+
           {/* Icon */}
           {status === 'idle' && (
             <div style={{ width: 44, height: 44, background: ACCENT_LIGHT, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
@@ -90,11 +99,34 @@ export function UploadZone() {
 
           {status === 'idle' && (
             <>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 6 }}>Drop your Uber data export here</div>
-              <div style={{ fontSize: 13, color: '#aaa', marginBottom: 16 }}>ZIP file from myprivacy.uber.com</div>
-              <div style={{ display: 'inline-block', fontSize: 13, color: ACCENT, border: `1px solid ${ACCENT}33`, background: ACCENT_LIGHT, borderRadius: 8, padding: '6px 16px', fontWeight: 500 }}>
-                Browse files
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 6 }}>
+                {isMobile ? 'Upload your Uber data export' : 'Drop your Uber data export here'}
               </div>
+              <div style={{ fontSize: 13, color: '#aaa', marginBottom: 20 }}>
+                ZIP file from myprivacy.uber.com
+              </div>
+              {/* Label triggers file input — works reliably on iOS Safari */}
+              <label
+                htmlFor="zip-input"
+                style={{
+                  display: 'inline-block',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: 'white',
+                  background: ACCENT,
+                  borderRadius: 10,
+                  padding: isMobile ? '12px 32px' : '9px 20px',
+                  cursor: 'pointer',
+                  marginBottom: isMobile ? 0 : 8,
+                }}
+              >
+                {isMobile ? 'Choose file' : 'Browse files'}
+              </label>
+              {!isMobile && (
+                <div style={{ fontSize: 12, color: '#ccc', marginTop: 10 }}>
+                  or drag and drop here
+                </div>
+              )}
             </>
           )}
 
@@ -144,16 +176,24 @@ export function UploadZone() {
             <>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#EF4444', marginBottom: 6 }}>Upload failed</div>
               <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>{error}</div>
-              <div
-                onClick={e => { e.stopPropagation(); document.getElementById('zip-input')?.click() }}
-                style={{ display: 'inline-block', fontSize: 13, color: ACCENT, border: `1px solid ${ACCENT}33`, background: ACCENT_LIGHT, borderRadius: 8, padding: '6px 16px', fontWeight: 500, cursor: 'pointer' }}
+              <label
+                htmlFor="zip-input"
+                style={{
+                  display: 'inline-block',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: ACCENT,
+                  border: `1px solid ${ACCENT}33`,
+                  background: ACCENT_LIGHT,
+                  borderRadius: 8,
+                  padding: '8px 20px',
+                  cursor: 'pointer',
+                }}
               >
                 Try again
-              </div>
+              </label>
             </>
           )}
-
-          <input id="zip-input" type="file" accept=".zip" style={{ display: 'none' }} onChange={onFileInput} />
         </div>
       )}
 
@@ -220,7 +260,7 @@ export function UploadZone() {
 
       {/* Help text */}
       {status === 'idle' && (
-        <div style={{ marginTop: 12, fontSize: 12, color: '#bbb', textAlign: 'center' }}>
+        <div style={{ marginTop: 14, fontSize: 12, color: '#bbb', textAlign: 'center' }}>
           Don't have your data yet?{' '}
           <a href="https://myprivacy.uber.com/exploreyourdata/download" target="_blank" rel="noreferrer" style={{ color: ACCENT, textDecoration: 'none' }}>
             Request it from Uber
