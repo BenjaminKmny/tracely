@@ -171,10 +171,10 @@ export function SignupPage() {
           </button>
         </form>
 
-        <p className="text-xs text-gray-300 text-center mt-5">
+        <p style={{ fontSize: 12, color: '#aaa', textAlign: 'center', marginTop: 20 }}>
           By signing up you agree to our{' '}
-          <a href="#" className="underline hover:text-gray-500 transition-colors">Terms</a> and{' '}
-          <a href="#" className="underline hover:text-gray-500 transition-colors">Privacy Policy</a>
+          <Link to="/privacy" style={{ color: '#368CB7', textDecoration: 'underline' }}>Terms</Link>{' '}and{' '}
+          <Link to="/privacy" style={{ color: '#368CB7', textDecoration: 'underline' }}>Privacy Policy</Link>
         </p>
 
         <p className="text-sm text-gray-400 text-center mt-4">

@@ -7,6 +7,8 @@ import { useEatsData } from '../hooks/useEatsData'
 import { generateRidesInsights, generateEatsInsights, Insight } from '../hooks/useInsights'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { Link } from 'react-router-dom'
+
 
 const ACCENT = '#368CB7'
 const ACCENT_LIGHT = '#EBF4FA'
@@ -84,7 +86,12 @@ export function InsightsPage() {
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
             <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 6 }}>No insights yet for {year}</div>
-            <div style={{ fontSize: 13, color: '#aaa' }}>Upload your data or try a different year.</div>
+            <div style={{ fontSize: 13, color: '#aaa' }}>
+                Try a different year or{' '}
+                <Link to="/dashboard/upload" style={{ color: ACCENT, textDecoration: 'none', fontWeight: 500 }}>
+                    upload your data
+                </Link>.
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
