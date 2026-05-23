@@ -23,7 +23,6 @@ const EATS_STATS = [
   { label: 'Top item',    value: 'Bowl' },
 ]
 
-// Per-month route/restaurant data
 const RIDES_BY_MONTH = [
   [{ name: 'Nova Zemblastraat → Osdorpplein', pct: 100, count: 3 }, { name: 'Schiphol → Van Oldenbarneveldtstr.', pct: 67, count: 2 }, { name: 'Leidseplein → Home', pct: 33, count: 1 }],
   [{ name: 'No rides this month', pct: 0, count: 0 }, { name: '', pct: 0, count: 0 }, { name: '', pct: 0, count: 0 }],
@@ -183,185 +182,54 @@ function BrowserMockup() {
             {hovered !== null && <span style={{ color: ACCENT, marginLeft: 6 }}>({MONTHS[hovered]})</span>}
           </div>
           {activeRows.map((r, i) => (
-            <div key={i} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 6,
-                opacity: r.name ? 1 : 0,
-                minHeight: 11,
-            }}>
-                <div style={{
-                fontSize: 9,
-                color: '#555',
-                width: 160,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, opacity: r.name ? 1 : 0, minHeight: 11 }}>
+              <div style={{ fontSize: 9, color: '#555', width: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {r.name || 'Placeholder'}
-                </div>
-
-                <div style={{ flex: 1, background: '#f0f0f0', borderRadius: 3, height: 5 }}>
-                <div style={{
-                    width: `${r.pct}%`,
-                    height: '100%',
-                    background: ACCENT,
-                    borderRadius: 3,
-                    transition: 'width 0.35s ease',
-                }} />
-                </div>
-
-                <div style={{ fontSize: 9, color: '#888', width: 20, textAlign: 'right' }}>
+              </div>
+              <div style={{ flex: 1, background: '#f0f0f0', borderRadius: 3, height: 5 }}>
+                <div style={{ width: `${r.pct}%`, height: '100%', background: ACCENT, borderRadius: 3, transition: 'width 0.35s ease' }} />
+              </div>
+              <div style={{ fontSize: 9, color: '#888', width: 20, textAlign: 'right' }}>
                 {r.count > 0 ? `${r.count}x` : ''}
-                </div>
+              </div>
             </div>
-            ))}
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
-// ─── Phone mockup (original slim design) ─────────────────────────────────────
+// ─── Phone mockup ─────────────────────────────────────────────────────────────
 
 function PhoneMockup() {
-    return (
-      <div style={{
-        width: 132,
-        background: '#0b0b0b',
-        borderRadius: 32,
-        padding: 5,
-        boxShadow: '0 24px 60px rgba(0,0,0,0.24), inset 0 0 0 1px #2a2a2a',
-        position: 'relative',
-      }}>
-        <div style={{
-          background: '#fff',
-          borderRadius: 27,
-          minHeight: 270,
-          overflow: 'hidden',
-          position: 'relative',
-          padding: '34px 9px 10px',
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: 8,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 34,
-            height: 5,
-            background: '#333',
-            borderRadius: 20,
-            zIndex: 2,
-          }} />
-  
-          <div style={{
-            fontSize: 8,
-            fontWeight: 800,
-            color: '#111',
-            marginBottom: 10,
-            letterSpacing: '-0.2px',
-          }}>
-            This week
-          </div>
-  
-          <div style={{
-            background: ACCENT_LIGHT,
-            borderRadius: 10,
-            padding: '8px',
-            marginBottom: 7,
-          }}>
-            <div style={{
-              fontSize: 7,
-              color: ACCENT,
-              fontWeight: 700,
-              marginBottom: 3,
-            }}>
-              Uber Eats
-            </div>
-            <div style={{
-              fontSize: 22,
-              fontWeight: 800,
-              color: '#111',
-              letterSpacing: '-0.8px',
-              lineHeight: 1,
-            }}>
-              €45.43
-            </div>
-            <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>
-              avg order this week
-            </div>
-          </div>
-  
-          <div style={{
-            background: '#f7f7f7',
-            borderRadius: 10,
-            padding: '8px',
-            marginBottom: 7,
-          }}>
-            <div style={{
-              fontSize: 7,
-              color: '#888',
-              fontWeight: 600,
-              marginBottom: 3,
-            }}>
-              Rides
-            </div>
-            <div style={{
-              fontSize: 22,
-              fontWeight: 800,
-              color: '#111',
-              letterSpacing: '-0.8px',
-              lineHeight: 1,
-            }}>
-              3
-            </div>
-            <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>
-              trips this week
-            </div>
-          </div>
-  
-          <div style={{
-            background: '#f7f7f7',
-            borderRadius: 10,
-            padding: '8px',
-          }}>
-            <div style={{
-              fontSize: 7,
-              color: '#888',
-              marginBottom: 3,
-            }}>
-              Top order
-            </div>
-            <div style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: '#111',
-              letterSpacing: '-0.2px',
-            }}>
-              Build Your Bowl
-            </div>
-            <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>
-              ordered 47 times
-            </div>
-          </div>
-  
-          <div style={{
-            position: 'absolute',
-            left: '50%',
-            bottom: 6,
-            transform: 'translateX(-50%)',
-            width: 34,
-            height: 4,
-            background: '#333',
-            borderRadius: 4,
-          }} />
+  return (
+    <div style={{ width: 132, background: '#0b0b0b', borderRadius: 32, padding: 5, boxShadow: '0 24px 60px rgba(0,0,0,0.24), inset 0 0 0 1px #2a2a2a', position: 'relative' }}>
+      <div style={{ background: '#fff', borderRadius: 27, minHeight: 270, overflow: 'hidden', position: 'relative', padding: '34px 9px 10px' }}>
+        <div style={{ position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)', width: 34, height: 5, background: '#333', borderRadius: 20, zIndex: 2 }} />
+        <div style={{ fontSize: 8, fontWeight: 800, color: '#111', marginBottom: 10, letterSpacing: '-0.2px' }}>This week</div>
+        <div style={{ background: ACCENT_LIGHT, borderRadius: 10, padding: '8px', marginBottom: 7 }}>
+          <div style={{ fontSize: 7, color: ACCENT, fontWeight: 700, marginBottom: 3 }}>Uber Eats</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#111', letterSpacing: '-0.8px', lineHeight: 1 }}>€45.43</div>
+          <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>avg order this week</div>
         </div>
+        <div style={{ background: '#f7f7f7', borderRadius: 10, padding: '8px', marginBottom: 7 }}>
+          <div style={{ fontSize: 7, color: '#888', fontWeight: 600, marginBottom: 3 }}>Rides</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#111', letterSpacing: '-0.8px', lineHeight: 1 }}>3</div>
+          <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>trips this week</div>
+        </div>
+        <div style={{ background: '#f7f7f7', borderRadius: 10, padding: '8px' }}>
+          <div style={{ fontSize: 7, color: '#888', marginBottom: 3 }}>Top order</div>
+          <div style={{ fontSize: 9, fontWeight: 800, color: '#111', letterSpacing: '-0.2px' }}>Build Your Bowl</div>
+          <div style={{ fontSize: 6.5, color: '#aaa', marginTop: 3 }}>ordered 47 times</div>
+        </div>
+        <div style={{ position: 'absolute', left: '50%', bottom: 6, transform: 'translateX(-50%)', width: 34, height: 4, background: '#333', borderRadius: 4 }} />
       </div>
-    )
-  }
+    </div>
+  )
+}
 
-// ─── Upload animation (original timing) ──────────────────────────────────────
+// ─── Upload animation ─────────────────────────────────────────────────────────
 
 function UploadAnimation() {
   const [frame, setFrame] = useState(0)
@@ -480,7 +348,7 @@ function UploadAnimation() {
   )
 }
 
-// ─── Infinite testimonial carousel ───────────────────────────────────────────
+// ─── Testimonial carousel ─────────────────────────────────────────────────────
 
 const CARD_WIDTH = 300
 const CARD_GAP = 18
@@ -489,14 +357,11 @@ function TestimonialCarousel() {
   const [index, setIndex] = useState(testimonials.length)
   const [isAnimating, setIsAnimating] = useState(true)
   const [isMoving, setIsMoving] = useState(false)
-
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
   const infinite = [...testimonials, ...testimonials, ...testimonials]
 
   const resetAutoTimer = () => {
     if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-
     autoTimerRef.current = setTimeout(() => {
       setIsAnimating(true)
       setIsMoving(true)
@@ -506,17 +371,12 @@ function TestimonialCarousel() {
 
   useEffect(() => {
     resetAutoTimer()
-
-    return () => {
-      if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-    }
+    return () => { if (autoTimerRef.current) clearTimeout(autoTimerRef.current) }
   }, [])
 
   const goTo = (next: number) => {
     if (isMoving) return
-
     if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-
     setIsAnimating(true)
     setIsMoving(true)
     setIndex(next)
@@ -524,9 +384,7 @@ function TestimonialCarousel() {
 
   const goNext = () => {
     if (isMoving) return
-
     if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-
     setIsAnimating(true)
     setIsMoving(true)
     setIndex(i => i + 1)
@@ -534,9 +392,7 @@ function TestimonialCarousel() {
 
   const goPrev = () => {
     if (isMoving) return
-
     if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-
     setIsAnimating(true)
     setIsMoving(true)
     setIndex(i => i - 1)
@@ -545,147 +401,38 @@ function TestimonialCarousel() {
   const onTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return
     if (e.propertyName !== 'transform') return
-
     setIsMoving(false)
-
-    if (index <= 0) {
-      setIsAnimating(false)
-      setIndex(testimonials.length)
-    } else if (index >= testimonials.length * 2) {
-      setIsAnimating(false)
-      setIndex(testimonials.length)
-    }
-
+    if (index <= 0) { setIsAnimating(false); setIndex(testimonials.length) }
+    else if (index >= testimonials.length * 2) { setIsAnimating(false); setIndex(testimonials.length) }
     resetAutoTimer()
   }
 
   const offset = index * (CARD_WIDTH + CARD_GAP)
-
-  const realIndex =
-    ((index - testimonials.length) % testimonials.length + testimonials.length) %
-    testimonials.length
+  const realIndex = ((index - testimonials.length) % testimonials.length + testimonials.length) % testimonials.length
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <div style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: '#aaa',
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          marginBottom: 8,
-        }}>
-          What people say
-        </div>
-
-        <h2 style={{
-          fontSize: 28,
-          fontWeight: 800,
-          color: '#111',
-          letterSpacing: '-0.8px',
-        }}>
-          The feeling of finally knowing
-        </h2>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#aaa', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>What people say</div>
+        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#111', letterSpacing: '-0.8px' }}>The feeling of finally knowing</h2>
       </div>
 
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        maxWidth: CARD_WIDTH + 180,
-        margin: '0 auto',
-        overflow: 'visible',
-      }}>
-        <div style={{
-          overflow: 'hidden',
-          borderRadius: 16,
-        }}>
-          <div
-            onTransitionEnd={onTransitionEnd}
-            style={{
-              display: 'flex',
-              gap: CARD_GAP,
-              transition: isAnimating
-                ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
-                : 'none',
-              transform: `translateX(calc(-${offset}px + 50% - ${CARD_WIDTH / 2}px))`,
-            }}
-          >
+      <div style={{ position: 'relative', width: '100%', maxWidth: CARD_WIDTH + 180, margin: '0 auto', overflow: 'visible' }}>
+        <div style={{ overflow: 'hidden', borderRadius: 16 }}>
+          <div onTransitionEnd={onTransitionEnd} style={{ display: 'flex', gap: CARD_GAP, transition: isAnimating ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)' : 'none', transform: `translateX(calc(-${offset}px + 50% - ${CARD_WIDTH / 2}px))` }}>
             {infinite.map((t, i) => {
               const isActive = i === index
-
               return (
-                <div
-                  key={i}
-                  onClick={() => goTo(i)}
-                  style={{
-                    width: CARD_WIDTH,
-                    minWidth: CARD_WIDTH,
-                    maxWidth: CARD_WIDTH,
-                    background: 'white',
-                    borderRadius: 16,
-                    padding: '26px 22px',
-                    minHeight: 220,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    border: `1.5px solid ${isActive ? ACCENT + '55' : '#eee'}`,
-                    transition: 'opacity 0.35s ease, transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
-                    opacity: isActive ? 1 : 0.22,
-                    transform: isActive ? 'scale(1)' : 'scale(0.92)',
-                    boxShadow: isActive ? `0 8px 32px ${ACCENT}15` : 'none',
-                    cursor: isMoving ? 'default' : 'pointer',
-                    flexShrink: 0,
-                    boxSizing: 'border-box',
-                  }}
-                >
+                <div key={i} onClick={() => goTo(i)} style={{ width: CARD_WIDTH, minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, background: 'white', borderRadius: 16, padding: '26px 22px', minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: `1.5px solid ${isActive ? ACCENT + '55' : '#eee'}`, transition: 'opacity 0.35s ease, transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease', opacity: isActive ? 1 : 0.22, transform: isActive ? 'scale(1)' : 'scale(0.92)', boxShadow: isActive ? `0 8px 32px ${ACCENT}15` : 'none', cursor: isMoving ? 'default' : 'pointer', flexShrink: 0, boxSizing: 'border-box' }}>
                   <div>
-                    <div style={{
-                      fontSize: 32,
-                      color: ACCENT,
-                      lineHeight: 1,
-                      marginBottom: 10,
-                      fontWeight: 900,
-                    }}>
-                      "
-                    </div>
-
-                    <p style={{
-                      fontSize: 14,
-                      color: '#444',
-                      lineHeight: 1.55,
-                      marginBottom: 18,
-                      fontStyle: 'italic',
-                      minHeight: 90,
-                    }}>
-                      {t.quote}
-                    </p>
+                    <div style={{ fontSize: 32, color: ACCENT, lineHeight: 1, marginBottom: 10, fontWeight: 900 }}>"</div>
+                    <p style={{ fontSize: 14, color: '#444', lineHeight: 1.55, marginBottom: 18, fontStyle: 'italic', minHeight: 90 }}>{t.quote}</p>
                   </div>
-
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: ACCENT_LIGHT,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 13,
-                      fontWeight: 800,
-                      color: ACCENT,
-                      flexShrink: 0,
-                    }}>
-                      {t.name[0]}
-                    </div>
-
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: ACCENT_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: ACCENT, flexShrink: 0 }}>{t.name[0]}</div>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>
-                        {t.name}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#bbb' }}>
-                        {t.location}
-                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>{t.name}</div>
+                      <div style={{ fontSize: 11, color: '#bbb' }}>{t.location}</div>
                     </div>
                   </div>
                 </div>
@@ -694,67 +441,17 @@ function TestimonialCarousel() {
           </div>
         </div>
 
-        <button onClick={goPrev} style={{
-          position: 'absolute',
-          left: -42,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 34,
-          height: 34,
-          borderRadius: '50%',
-          border: '1px solid #e0e0e0',
-          background: 'white',
-          cursor: isMoving ? 'default' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          zIndex: 2,
-        }}>
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#555">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+        <button onClick={goPrev} style={{ position: 'absolute', left: -42, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, borderRadius: '50%', border: '1px solid #e0e0e0', background: 'white', cursor: isMoving ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', zIndex: 2 }}>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
-
-        <button onClick={goNext} style={{
-          position: 'absolute',
-          right: -42,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 34,
-          height: 34,
-          borderRadius: '50%',
-          border: '1px solid #e0e0e0',
-          background: 'white',
-          cursor: isMoving ? 'default' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          zIndex: 2,
-        }}>
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#555">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+        <button onClick={goNext} style={{ position: 'absolute', right: -42, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, borderRadius: '50%', border: '1px solid #e0e0e0', background: 'white', cursor: isMoving ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', zIndex: 2 }}>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
         {testimonials.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i + testimonials.length)}
-            style={{
-              width: realIndex === i ? 20 : 6,
-              height: 6,
-              borderRadius: 100,
-              border: 'none',
-              background: realIndex === i ? ACCENT : '#ddd',
-              cursor: isMoving ? 'default' : 'pointer',
-              transition: 'all 0.3s',
-              padding: 0,
-            }}
-          />
+          <button key={i} onClick={() => goTo(i + testimonials.length)} style={{ width: realIndex === i ? 20 : 6, height: 6, borderRadius: 100, border: 'none', background: realIndex === i ? ACCENT : '#ddd', cursor: isMoving ? 'default' : 'pointer', transition: 'all 0.3s', padding: 0 }} />
         ))}
       </div>
     </div>
@@ -771,23 +468,34 @@ export function LandingPage() {
       <header style={{ borderBottom: '1px solid #f0f0f0', padding: '0 32px', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', zIndex: 100 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 58 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-          <div
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
-          >
-            <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
+            <div onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
+              </div>
+              <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
             </div>
-            <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
-          </div>
             <nav style={{ display: 'flex', gap: 2 }}>
-              {[{ label: 'How it works', href: '#how-it-works' }, { label: 'Features', href: '#features' }, { label: 'Pricing', href: '#pricing' }].map(item => (
-                <a key={item.label} href={item.href}
-                  style={{ fontSize: 14, color: '#666', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500 }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#111')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#666')}
-                >{item.label}</a>
-              ))}
+              <a
+                href="#how-it-works"
+                onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }}
+                style={{ fontSize: 14, color: '#666', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500, cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#111')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#666')}
+              >How it works</a>
+              <a
+                href="#features"
+                onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) }}
+                style={{ fontSize: 14, color: '#666', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500, cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#111')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#666')}
+              >Features</a>
+              <a
+                href="#pricing"
+                onClick={e => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }) }}
+                style={{ fontSize: 14, color: '#666', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500, cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#111')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#666')}
+              >Pricing</a>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -812,7 +520,11 @@ export function LandingPage() {
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
             <Link to="/signup" style={{ fontSize: 15, background: ACCENT, color: 'white', textDecoration: 'none', padding: '13px 28px', borderRadius: 10, fontWeight: 700 }}>Start for free</Link>
-            <a href="#how-it-works" style={{ fontSize: 15, color: '#666', textDecoration: 'none', padding: '13px 28px', borderRadius: 10, fontWeight: 500, border: '1px solid #e8e8e8' }}>See how it works</a>
+            <a
+              href="#how-it-works"
+              onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }}
+              style={{ fontSize: 15, color: '#666', textDecoration: 'none', padding: '13px 28px', borderRadius: 10, fontWeight: 500, border: '1px solid #e8e8e8', cursor: 'pointer' }}
+            >See how it works</a>
           </div>
           <div style={{ fontSize: 12, color: '#bbb', fontWeight: 500 }}>Free forever. No credit card needed.</div>
         </div>
@@ -917,7 +629,7 @@ export function LandingPage() {
                 <span style={{ fontSize: 40, fontWeight: 900, color: '#111', letterSpacing: '-1px' }}>€0</span>
                 <span style={{ fontSize: 13, color: '#aaa' }}>/month</span>
               </div>
-              {['Rides dashboard', 'Eats dashboard', 'Full history', 'Upload every 2 months', 'GDPR data deletion'].map(item => (
+              {['Rides dashboard', 'Eats dashboard', 'Full history', 'Unlimited uploads', 'GDPR data deletion'].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#22C55E"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                   <span style={{ fontSize: 13, color: '#555' }}>{item}</span>
@@ -934,7 +646,7 @@ export function LandingPage() {
                 <span style={{ fontSize: 40, fontWeight: 900, color: 'white', letterSpacing: '-1px' }}>€6.99</span>
                 <span style={{ fontSize: 13, color: '#555' }}>/month</span>
               </div>
-              {['Everything in Free', 'Unlimited uploads', 'Bolt, Deliveroo and more', 'AI meal replacement suggestions', 'Live ingredient pricing'].map(item => (
+              {['Everything in Free', 'Bolt, Deliveroo and more', 'AI meal replacement suggestions', 'Live ingredient pricing', 'Priority support'].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={ACCENT}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                   <span style={{ fontSize: 13, color: '#888' }}>{item}</span>
