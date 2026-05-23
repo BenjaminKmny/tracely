@@ -771,12 +771,15 @@ export function LandingPage() {
       <header style={{ borderBottom: '1px solid #f0f0f0', padding: '0 32px', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', zIndex: 100 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 58 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
-              </div>
-              <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
+          <div
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+          >
+            <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
             </div>
+            <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
+          </div>
             <nav style={{ display: 'flex', gap: 2 }}>
               {[{ label: 'How it works', href: '#how-it-works' }, { label: 'Features', href: '#features' }, { label: 'Pricing', href: '#pricing' }].map(item => (
                 <a key={item.label} href={item.href}

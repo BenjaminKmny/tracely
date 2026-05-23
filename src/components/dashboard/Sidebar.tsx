@@ -85,7 +85,7 @@ export function Sidebar({ lastUpload }: SidebarProps) {
 
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #f5f5f5' }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+      <Link to="/dashboard/rides" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
           <div style={{ width: 26, height: 26, background: '#111', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
           </div>
