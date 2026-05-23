@@ -194,12 +194,12 @@ export function EatsDashboard() {
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🍔</div>
             <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 6 }}>No Eats orders in {year}</div>
-            <div style={{ fontSize: 13, color: '#aaa' }}>
-                Try a different year or{' '}
-                <Link to="/dashboard/upload" style={{ color: ACCENT, textDecoration: 'none', fontWeight: 500 }}>
-                    upload your data
-                </Link>.
+            <div style={{ fontSize: 13, color: '#aaa', marginBottom: 20 }}>
+                Try a different year or upload your Uber data to get started.
             </div>
+            <Link to="/dashboard/upload" style={{ display: 'inline-block', fontSize: 13, fontWeight: 600, color: 'white', background: ACCENT, textDecoration: 'none', padding: '10px 20px', borderRadius: 9 }}>
+                Upload data →
+            </Link>
           </div>
         ) : (
           <>
