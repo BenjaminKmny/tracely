@@ -1,14 +1,12 @@
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
-
-const ACCENT = '#368CB7'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard/rides': 'Rides',
   '/dashboard/eats': 'Uber Eats',
   '/dashboard/insights': 'Insights',
   '/dashboard/upload': 'Upload data',
+  '/dashboard/guide': 'How to get data',
   '/dashboard/settings': 'Settings',
 }
 
@@ -37,11 +35,8 @@ export function MobileHeader() {
         </div>
         <span style={{ fontWeight: 800, fontSize: 15, color: '#111', letterSpacing: '-0.4px' }}>Tracely</span>
       </Link>
-      <span style={{ fontSize: 15, fontWeight: 700, color: '#111', letterSpacing: '-0.3px' }}>{title}</span>
-      <button
-        onClick={handleSignOut}
-        style={{ fontSize: 12, color: '#aaa', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
-      >
+      <span style={{ fontSize: 14, fontWeight: 700, color: '#111', letterSpacing: '-0.3px', maxWidth: 160, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+      <button onClick={handleSignOut} style={{ fontSize: 12, color: '#aaa', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', minWidth: 55, textAlign: 'right' }}>
         Sign out
       </button>
     </div>
